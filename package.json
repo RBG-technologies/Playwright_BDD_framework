@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "identity": "node -e \"const n=Buffer.from('VGhpcnVtYW5kYXMgU2FpdGVqYSBHb3Vk','base64').toString('utf8');console.log('[Framework Owner] '+n)\"",
+    "setup": "node scripts/setup.js",
     "pretest": "npm run identity --silent",
     "pretest:raw": "node src/utils/cleanResults.js",
     "pretest:one": "node src/utils/cleanResults.js",

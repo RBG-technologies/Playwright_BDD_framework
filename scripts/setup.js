@@ -5,8 +5,8 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const repoRoot = path.resolve(__dirname, "..");
-const frameworkRoot = path.join(repoRoot, "playwright-bdd-framework");
+const frameworkRoot = path.resolve(__dirname, "..");
+const repoRoot = path.resolve(frameworkRoot, "..");
 
 const npmCli = process.env.npm_execpath;
 

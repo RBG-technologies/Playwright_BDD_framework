@@ -47,16 +47,8 @@ export class PlaywrightActions {
     }
   }
 
-  async goto(url: string, waitForSelector?: LocatorTarget): Promise<void> {
+  async goto(url: string): Promise<void> {
     await this.page.goto(url, { waitUntil: "domcontentloaded" });
-
-    if (waitForSelector) {
-      await this.waitForVisible(waitForSelector, this.runtime.navigationTimeoutMs);
-    }
-  }
-
-  async waitForVisible(target: LocatorTarget, timeout = this.runtime.actionTimeoutMs): Promise<void> {
-    await this.locator(target).waitFor({ state: "visible", timeout });
   }
 
   async waitForHidden(target: LocatorTarget, timeout = this.runtime.actionTimeoutMs): Promise<void> {
@@ -120,48 +112,40 @@ export class PlaywrightActions {
   }
 
   async click(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).click();
   }
 
   async dblclick(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).dblclick();
   }
 
   async rightclick(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).click({ button: "right" });
   }
 
   async tap(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).tap();
   }
 
   async focus(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).focus();
   }
 
   async blur(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.locator(target).blur();
   }
 
   async pressSequentially(target: LocatorTarget, text: string, delay?: number): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).pressSequentially(text, { delay });
   }
 
   async getAttribute(target: LocatorTarget, name: string): Promise<string | null> {
-    await this.waitForVisible(target);
     return this.locator(target).getAttribute(name);
   }
 
@@ -174,25 +158,20 @@ export class PlaywrightActions {
     pageFunction: (el: HTMLElement | SVGElement, arg: unknown) => R | Promise<R>,
     arg?: unknown
   ): Promise<R> {
-    await this.waitForVisible(target);
     return this.locator(target).evaluate(pageFunction, arg);
   }
 
   async fillText(target: LocatorTarget, value: string): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).fill(value);
   }
 
   async clear(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).clear();
   }
 
   async dragAndDrop(source: LocatorTarget, target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(source);
-    await this.waitForVisible(target);
     await this.highlight(source);
     await this.locator(source).dragTo(this.locator(target));
   }
@@ -202,70 +181,58 @@ export class PlaywrightActions {
     type: string,
     eventInit?: Record<string, unknown>
   ): Promise<void> {
-    await this.waitForVisible(target);
     await this.locator(target).dispatchEvent(type, eventInit);
   }
 
   async typeSequentially(target: LocatorTarget, value: string, delay?: number): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).fill("");
     await this.locator(target).pressSequentially(value, { delay });
   }
 
   async press(target: LocatorTarget, key: string): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).press(key);
   }
 
   async check(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).check();
   }
 
   async uncheck(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).uncheck();
   }
 
   async select(target: LocatorTarget, option: SelectOptionInput): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).selectOption(option);
   }
 
   async hover(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).hover();
   }
 
   async scrollIntoView(target: LocatorTarget): Promise<void> {
-    await this.waitForVisible(target);
     await this.locator(target).scrollIntoViewIfNeeded();
   }
 
   async uploadFile(target: LocatorTarget, filePaths: string | string[]): Promise<void> {
-    await this.waitForVisible(target);
     await this.highlight(target);
     await this.locator(target).setInputFiles(filePaths);
   }
 
   async getText(target: LocatorTarget): Promise<string> {
-    await this.waitForVisible(target);
     return (await this.locator(target).innerText()).trim();
   }
 
   async getInputValue(target: LocatorTarget): Promise<string> {
-    await this.waitForVisible(target);
     return this.locator(target).inputValue();
   }
 
   async isChecked(target: LocatorTarget): Promise<boolean> {
-    await this.waitForVisible(target);
     return this.locator(target).isChecked();
   }
 
