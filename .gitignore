@@ -6,8 +6,11 @@ node_modules/
 .env.local
 .env.*.local
 
-# Playwright
+# Tests
 test-results/
+src/tests/features/
+src/tests/stepDefinitions/
+src/pages/
 playwright-report/
 blob-report/
 playwright/.cache/
