@@ -8,9 +8,13 @@ node_modules/
 
 # Tests
 test-results/
-src/tests/features/
-src/tests/stepDefinitions/
-src/pages/
+src/tests/features/*
+!src/tests/features/Demo.feature
+src/tests/stepDefinitions/*
+!src/tests/stepDefinitions/demoStepDef.ts
+src/pages/*
+!src/pages/demoPages.ts
+
 playwright-report/
 blob-report/
 playwright/.cache/
