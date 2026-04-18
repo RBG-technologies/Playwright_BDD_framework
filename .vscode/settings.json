@@ -1,11 +1,19 @@
 {
   "cucumberautocomplete.steps": [
-    "src/tests/stepDefinitions/**/*.ts"
+    "src/tests/stepDefinitions/**/*.ts",
+    "src/tests/hooks/**/*.ts"
   ],
   "cucumberautocomplete.syncfeatures": "src/tests/features/**/*.feature",
   "cucumberautocomplete.strictGherkinCompletion": true,
   "cucumberautocomplete.smartSnippets": true,
   "cucumberautocomplete.onTypeFormat": true,
+  "cucumber.features": [
+    "src/tests/features/**/*.feature"
+  ],
+  "cucumber.glue": [
+    "src/tests/stepDefinitions/**/*.ts",
+    "src/tests/hooks/**/*.ts"
+  ],
   "code-runner.executorMapByFileExtension": {
     ".feature": "npm run test:one -- --file $fileName"
   }
