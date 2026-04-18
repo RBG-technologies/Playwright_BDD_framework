@@ -2,77 +2,76 @@
 
 This is the short user guide for daily use.
 
-## 1) Install
+## 1) Setup
 
 ```bash
-npm install
-npx playwright install
+# Installs dependencies, Playwright browsers, and bootstraps .env
+npm run setup
 ```
 
 ## 2) Configure
 
-```bash
-# PowerShell
-Copy-Item .env.example .env
-```
+The `setup` script automatically creates a `.env` file from `.env.example`.
+Update the following key values in `.env`:
+- `BASE_URL`: The target website URL.
+- `BROWSER`: `chromium` (default), `firefox`, or `webkit`.
+- `HEADLESS`: `true` (default) or `false` (for headed mode).
+- `PARALLEL`: Set to 0 (default) for serial or > 1 for parallel execution.
+- `TAGS`: Default Cucumber tags to filter scenarios (e.g., `@smoke`).
 
-Update only required values in `.env`:
-- `BASE_URL`
-- `APP_USERNAME`
-- `APP_PASSWORD`
-- `BROWSER` (`chromium` / `firefox` / `webkit`)
-- `HEADLESS` (`true` / `false`)
-
-## 3) Framework Structure (What to use where)
+## 3) Framework Structure
 
 ```text
 src/
-	config/
-		cucumber.cjs           -> Cucumber runtime config (paths, formatters, tags)
-		runtimeConfig.ts       -> Reads/validates environment variables
-	pages/                   -> Page Object classes
-	factories/               -> Test data builders/helpers
+	config/           -> cucumber and runtime configuration
+	pages/            -> Page Object classes (UI logic)
+	factories/        -> Test data builders
 	tests/
-		features/              -> Gherkin feature files (.feature)
-		stepDefinitions/       -> Step implementations for Given/When/Then
-		hooks/                 -> Before/After hooks (browser/context/page lifecycle)
-		support/               -> Custom world and shared test context
-	utils/                   -> Common helpers (actions, assertions, reports, step checks)
+		features/     -> Gherkin feature files (.feature)
+		stepDefinitions/ -> Step implementations
+		hooks/        -> Browser/Context lifecycle hooks
+		support/      -> Custom world and shared context
+	utils/            -> Helpers (assertions, reports, step checks)
+scripts/              -> Setup and utility scripts
 ```
 
-### Flow to understand
-1. You write scenarios in `features`.
-2. Cucumber matches them with `stepDefinitions`.
-3. Step files call page methods from `pages`.
-4. Hooks create and close browser resources per scenario.
-5. Results go to Allure files/reports.
-
-## 4) Run
+## 4) Run Tests
 
 ```bash
-npm run bdd
+# Run all tests (configured in src/config/cucumber.cjs)
+npm run test
+
+# Run tests with a UI report workflow (Run -> Generate -> Open)
+npm run test:report
+
+# Run specific tag groups
+npm run test:smoke
+npm run test:regression
+npm run test:api
 ```
 
 ## 5) Useful Commands
 
-```bash
-npm run steps:check
-npm run steps:generate -- --feature src/tests/features/yourFeature.feature
-npm run report:generate
-npm run report:open
-npm run lint
-```
+### Reporting & Maintenance
+- `npm run report:dashboard` -> View unified history of past Allure/Cucumber reports.
+- `npm run report:generate`  -> Generate Allure report from current results.
+- `npm run steps:check`      -> Verify all Gherkin steps are implemented.
+- `npm run format`           -> Auto-format code using Prettier.
+- `npm run lint`             -> Check for code quality issues.
 
-## 6) Add a Test
+### Advanced
+- `npm run test:one`         -> Interactively run a single feature file.
+- `npm run steps:generate -- --feature <path>` -> Scaffold steps for a new feature.
 
-1. Add a scenario in `src/tests/features/`.
-2. Add matching steps in `src/tests/stepDefinitions/`.
-3. Reuse or create page objects in `src/pages/`.
-4. Run `npm run steps:check`.
-5. Run `npm run bdd`.
+## 6) Add a Test Scenario
+
+1. Create a `.feature` file in `src/tests/features/`.
+2. Implement matching steps in `src/tests/stepDefinitions/`.
+3. Use or create Page Objects in `src/pages/` for UI interactions.
+4. Run `npm run test` (or use tags for isolation).
 
 ## 7) Notes
 
-- This template starts with 0 real test cases.
-- Keep `.env.example` generic; do not commit real secrets.
-- Full technical documentation: `README.md`.
+- **Report History**: Archived reports are stored in `report-history/`.
+- **Environment**: Keep `.env` local; do not commit secrets.
+- **Java**: Allure reports require Java 11+ installed and in your PATH.
