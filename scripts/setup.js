@@ -13,13 +13,28 @@ const npmCli = process.env.npm_execpath || findNpmCli();
 function run(command, args, cwd, title) {
   console.log(`\n=== ${title} ===`);
 
-  // On Windows, if the command path has spaces, it must be quoted when shell: true is used.
-  const cmd = (process.platform === "win32" && command.includes(" ")) ? `"${command}"` : command;
+  const isWin = process.platform === "win32";
+  
+  // On Windows, if shell: true is used, both the command and every argument 
+  // that contains spaces must be explicitly quoted.
+  let cmd = command;
+  let cmdArgs = [...args];
 
-  const result = spawnSync(cmd, args, {
+  if (isWin) {
+    if (cmd.includes(" ")) {
+      cmd = `"${cmd}"`;
+    }
+    cmdArgs = cmdArgs.map(arg => 
+      (typeof arg === "string" && arg.includes(" ") && !arg.startsWith("\"")) 
+        ? `"${arg}"` 
+        : arg
+    );
+  }
+
+  const result = spawnSync(cmd, cmdArgs, {
     cwd,
     stdio: "inherit",
-    shell: process.platform === "win32"
+    shell: isWin
   });
 
   if (result.status !== 0) {
