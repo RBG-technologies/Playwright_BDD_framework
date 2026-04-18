@@ -6,28 +6,29 @@ import { z } from "zod";
 const boolTrue = (v?: string) => !["false", "0", "no", "n", "off"].includes((v ?? "true").toLowerCase());
 const boolFlag = (v?: string) => ["true", "1", "yes", "y", "on"].includes((v ?? "").toLowerCase());
 
+const trimString = (u: unknown) => (typeof u === "string" ? u.trim() : u);
+
 const envSchema = z.object({
-  BROWSER: z.enum(["chromium", "firefox", "webkit"]).default("chromium"),
-  HEADLESS: z.string().optional().transform(boolTrue),
+  BROWSER: z.preprocess(trimString, z.enum(["chromium", "firefox", "webkit"]).default("chromium")),
+  HEADLESS: z.preprocess(trimString, z.string().optional().transform(boolTrue)),
   SLOW_MO: z.coerce.number().nonnegative().default(0),
   DEFAULT_TIMEOUT_MS: z.coerce.number().positive().default(60_000),
   ACTION_TIMEOUT_MS: z.coerce.number().positive().default(10_000),
   NAVIGATION_TIMEOUT_MS: z.coerce.number().positive().default(30_000),
-  MAXIMIZE: z.string().optional().transform(boolFlag),
-  BASE_URL: z.string().default(""),
-  LOGIN_URL: z.string().default(""),
-  BASIC_CONTROLS_URL: z.string().default("https://www.hyrtutorials.com/p/basic-controls.html"),
-  NOP_COMMERCE_URL: z.string().default(""),
-  APP_USERNAME: z.string().default(""),
-  APP_PASSWORD: z.string().default(""),
-  ALLOW_MANUAL_VERIFICATION: z.string().optional().transform(boolFlag),
+  MAXIMIZE: z.preprocess(trimString, z.string().optional().transform(boolFlag)),
+  BASE_URL: z.preprocess(trimString, z.string().default("")),
+  LOGIN_URL: z.preprocess(trimString, z.string().default("")),
+  NOP_COMMERCE_URL: z.preprocess(trimString, z.string().default("")),
+  APP_USERNAME: z.preprocess(trimString, z.string().default("")),
+  APP_PASSWORD: z.preprocess(trimString, z.string().default("")),
+  ALLOW_MANUAL_VERIFICATION: z.preprocess(trimString, z.string().optional().transform(boolFlag)),
   MANUAL_VERIFICATION_TIMEOUT_MS: z.coerce.number().positive().default(120_000),
-  HIGHLIGHT_ELEMENTS: z.string().optional().transform(boolFlag),
-  TRACE: z.string().optional().transform(boolFlag),
-  SCREENSHOT_ON_FAILURE: z.string().optional().transform(boolTrue),
-  ATTACH_SCREENSHOTS: z.string().optional().transform(boolFlag),
-  RECORD_VIDEO: z.string().optional().transform(boolFlag),
-  ALLURE_RESULTS_DIR: z.string().default("allure-results"),
+  HIGHLIGHT_ELEMENTS: z.preprocess(trimString, z.string().optional().transform(boolFlag)),
+  TRACE: z.preprocess(trimString, z.string().optional().transform(boolFlag)),
+  SCREENSHOT_ON_FAILURE: z.preprocess(trimString, z.string().optional().transform(boolTrue)),
+  ATTACH_SCREENSHOTS: z.preprocess(trimString, z.string().optional().transform(boolFlag)),
+  RECORD_VIDEO: z.preprocess(trimString, z.string().optional().transform(boolFlag)),
+  ALLURE_RESULTS_DIR: z.preprocess(trimString, z.string().default("allure-results")),
 });
 
 // ─── Validation (fail fast on bad values) ─────────────────────────────────────
@@ -36,10 +37,12 @@ const parseResult = envSchema.safeParse(process.env);
 
 if (!parseResult.success) {
   console.error("\n❌ Invalid environment configuration:");
-  for (const issue of parseResult.error.issues) {
-    console.error(`   ${issue.path.join(".")} — ${issue.message}`);
-  }
-  console.error("\nCheck your .env file against .env.example and fix the above values.\n");
+  parseResult.error.issues.forEach((issue) => {
+    const property = issue.path.join(".");
+    const value = process.env[property] !== undefined ? `"${process.env[property]}"` : "(not set)";
+    console.error(`   👉 ${property}: ${issue.message} (received: ${value})`);
+  });
+  console.error("\nCheck your .env file and ensure values are correct.\n");
   process.exit(1);
 }
 
@@ -63,7 +66,6 @@ for (const [key, value] of Object.entries(process.env)) {
 const allUrls: Record<string, string> = {
   baseUrl: env.BASE_URL,
   loginUrl: env.LOGIN_URL,
-  basicControlsUrl: env.BASIC_CONTROLS_URL,
   nopCommerceUrl: env.NOP_COMMERCE_URL,
   ...dynamicUrls,
 };
@@ -82,7 +84,6 @@ export interface RuntimeConfig {
   maximize: boolean;
   baseUrl: string;
   loginUrl: string;
-  basicControlsUrl: string;
   nopCommerceUrl: string;
   username: string;
   password: string;
@@ -109,7 +110,6 @@ export const runtimeConfig: RuntimeConfig = {
   maximize: env.MAXIMIZE,
   baseUrl: env.BASE_URL,
   loginUrl: env.LOGIN_URL,
-  basicControlsUrl: env.BASIC_CONTROLS_URL,
   nopCommerceUrl: env.NOP_COMMERCE_URL,
   username: env.APP_USERNAME,
   password: env.APP_PASSWORD,

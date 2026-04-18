@@ -41,7 +41,9 @@ yarn-error.log*
 Thumbs.db
 
 # IDEs
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 
 # Report History (Includes dashboard, ignores individual report folders)
