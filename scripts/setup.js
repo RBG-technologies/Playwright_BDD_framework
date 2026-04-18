@@ -12,10 +12,14 @@ const npmCli = process.env.npm_execpath || findNpmCli();
 
 function run(command, args, cwd, title) {
   console.log(`\n=== ${title} ===`);
-  const result = spawnSync(command, args, {
+
+  // On Windows, if the command path has spaces, it must be quoted when shell: true is used.
+  const cmd = (process.platform === "win32" && command.includes(" ")) ? `"${command}"` : command;
+
+  const result = spawnSync(cmd, args, {
     cwd,
     stdio: "inherit",
-    shell: process.platform === "win32" // Use shell on Windows for better compatibility with PATH
+    shell: process.platform === "win32"
   });
 
   if (result.status !== 0) {
@@ -28,11 +32,11 @@ function runNpm(args, cwd, title) {
     throw new Error("npm CLI not found. Please ensure npm is installed and in your PATH.");
   }
 
-  // If we have an absolute path to npm-cli.js (from npm_execpath), run it with node
+  // If we have an absolute path to npm-cli.js (from npm_execpath or similar)
   if (npmCli.endsWith(".js")) {
     run(process.execPath, [npmCli, ...args], cwd, title);
   } else {
-    // Otherwise run the 'npm' command directly
+    // Otherwise run the 'npm' command directly (which is usually a shell script/cmd on Windows)
     run(npmCli, args, cwd, title);
   }
 }
