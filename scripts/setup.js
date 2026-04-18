@@ -8,14 +8,14 @@ const __dirname = path.dirname(__filename);
 const frameworkRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(frameworkRoot, "..");
 
-const npmCli = process.env.npm_execpath;
+const npmCli = process.env.npm_execpath || findNpmCli();
 
 function run(command, args, cwd, title) {
   console.log(`\n=== ${title} ===`);
   const result = spawnSync(command, args, {
     cwd,
     stdio: "inherit",
-    shell: false
+    shell: process.platform === "win32" // Use shell on Windows for better compatibility with PATH
   });
 
   if (result.status !== 0) {
@@ -25,10 +25,30 @@ function run(command, args, cwd, title) {
 
 function runNpm(args, cwd, title) {
   if (!npmCli) {
-    throw new Error("npm runtime metadata not found. Run setup with: npm run setup");
+    throw new Error("npm CLI not found. Please ensure npm is installed and in your PATH.");
   }
 
-  run(process.execPath, [npmCli, ...args], cwd, title);
+  // If we have an absolute path to npm-cli.js (from npm_execpath), run it with node
+  if (npmCli.endsWith(".js")) {
+    run(process.execPath, [npmCli, ...args], cwd, title);
+  } else {
+    // Otherwise run the 'npm' command directly
+    run(npmCli, args, cwd, title);
+  }
+}
+
+/**
+ * Attempt to find npm CLI if not provided via environment.
+ */
+function findNpmCli() {
+  const result = spawnSync(process.platform === "win32" ? "where" : "which", ["npm"], {
+    shell: process.platform === "win32"
+  });
+
+  if (result.status === 0) {
+    return "npm";
+  }
+  return null;
 }
 
 function ensureEnvFile() {
@@ -52,10 +72,10 @@ function checkJava() {
   const result = spawnSync("java", ["-version"], {
     cwd: repoRoot,
     stdio: "pipe",
-    shell: false
+    shell: process.platform === "win32"
   });
 
-  if (result.status !== 0) {
+  if (result.status !== 0 || result.error) {
     console.warn("\n[Warning] Java is not available in PATH. Allure report commands need Java.");
     console.warn("Install Java 11+ and reopen terminal to use report/open-report commands.\n");
     return;

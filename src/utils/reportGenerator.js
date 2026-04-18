@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import os from "node:os";
 import fs from "node:fs";
+import { archiveReports } from "./archiveReports.js";
 
 const require = createRequire(import.meta.url);
 const report = require("multiple-cucumber-html-reporter");
@@ -91,3 +92,6 @@ const htmlReport = path.join(reportPath, "index.html");
 
 console.log("\n✅ Cucumber HTML report generated:");
 console.log("  " + htmlReport + "\n");
+
+// Archive the newly generated report
+archiveReports();
