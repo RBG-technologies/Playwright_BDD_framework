@@ -92,7 +92,16 @@ async function main() {
   }
 
   const cwd = process.cwd();
-  const featurePath = path.resolve(cwd, featureArg);
+  let featurePath = path.resolve(cwd, featureArg);
+
+  // If provided path doesn't exist, try looking in the features directory
+  try {
+    await fs.access(featurePath);
+  } catch {
+    const featuresDir = path.resolve(cwd, "src/tests/features");
+    const featureFileName = featureArg.endsWith(".feature") ? featureArg : `${featureArg}.feature`;
+    featurePath = path.resolve(featuresDir, featureFileName);
+  }
 
   let featureContent;
   try {
@@ -108,7 +117,8 @@ async function main() {
     process.exit(1);
   }
 
-  const defaultFileName = `${toPascalCase(path.basename(featurePath, path.extname(featurePath)))}Steps.ts`;
+  const baseName = path.basename(featurePath, path.extname(featurePath));
+  const defaultFileName = `${baseName}_stepdef.ts`;
   const outputPath = outArg
     ? path.resolve(cwd, outArg)
     : path.resolve(cwd, "src/tests/stepDefinitions", defaultFileName);
