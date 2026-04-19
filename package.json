@@ -25,7 +25,7 @@
     "test:wip": "cross-env TAGS=@wip npm run test:raw",
     "test:flaky": "cross-env TAGS=@flaky RETRY=3 npm run test:raw",
     "test:api": "cross-env TAGS=@api npm run test:raw",
-    "test:dry": "npm run test:raw -- --dry-run",
+    "test:dry": "node scripts/dryRun.js",
     "steps:generate": "node src/utils/generateStepDefs.js",
     "steps:check": "node src/utils/checkSteps.js",
     "report:generate": "allure generate allure-results --clean -o allure-report && npm run report:archive",
