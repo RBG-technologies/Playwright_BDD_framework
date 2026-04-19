@@ -36,7 +36,8 @@ BeforeAll(async function () {
   sharedBrowser = await launcher.launch(launchOptions);
 });
 
-Before(async function (this: CustomWorld) {
+Before(async function (this: CustomWorld, { pickle }) {
+  console.log(`\n🚀 Scenario: ${pickle.name}`);
   const testResultsDir = path.resolve(process.cwd(), "test-results");
   const videoDir = path.join(testResultsDir, "videos");
   if (!fs.existsSync(videoDir)) {
@@ -65,9 +66,13 @@ Before(async function (this: CustomWorld) {
   this.formData = {};
 });
 
-AfterStep(async function (this: CustomWorld, { result }) {
-  // Screenshots are handled in the After hook (on failure) or via configuration.
-  // Removed per-step screenshots as requested by the user.
+AfterStep(async function (this: CustomWorld, { result, pickleStep }) {
+  if (result.status === Status.FAILED) {
+    console.log(`  ❌ Step Failed: ${pickleStep.text}`);
+    console.log(`     Error: ${result.message}\n`);
+  } else if (result.status === Status.PASSED) {
+    console.log(`  ✔ Step Passed: ${pickleStep.text}`);
+  }
 });
 
 After(async function (this: CustomWorld, { result, pickle }) {
