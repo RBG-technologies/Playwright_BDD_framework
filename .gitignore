@@ -46,9 +46,8 @@ Thumbs.db
 !.vscode/extensions.json
 .idea/
 
-# Report History (Includes dashboard, ignores individual report folders)
-report-history/*/
-!report-history/index.html
+# Report History
+report-history/
 
 # Documentation
 README.md
