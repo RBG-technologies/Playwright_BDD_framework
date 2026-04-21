@@ -16,5 +16,8 @@
   ],
   "code-runner.executorMapByFileExtension": {
     ".feature": "npm run test:one -- --file $fileName"
+  },
+  "editor.codeActionsOnSave": {
+    "source.addMissingImports": "always"
   }
 }

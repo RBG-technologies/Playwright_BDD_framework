@@ -1,4 +1,5 @@
-import { Page, expect } from '@playwright/test';
+import { runtimeConfig } from "../config/runtimeConfig.ts";
+import { Page, expect } from "@playwright/test";
 import type { RuntimeConfig } from "../config/runtimeConfig.ts";
 import { PlaywrightActions } from "../utils/playwrightActions.ts";
 

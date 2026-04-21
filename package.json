@@ -47,6 +47,8 @@
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"src/**/*.js\"",
+    "imports:check": "node src/utils/autoImporter.js",
+    "imports:fix": "node src/utils/autoImporter.js --fix",
     "bdd": "cucumber-js --config src/config/cucumber.cjs"
   },
   "keywords": [],

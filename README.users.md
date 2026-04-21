@@ -48,14 +48,20 @@ npm run test:report
 npm run test:smoke
 npm run test:regression
 npm run test:api
+
+# Dry run (validate steps without browser)
+npm run test:dry
 ```
 
 ## 5) Useful Commands
 
 ### Reporting & Maintenance
 - `npm run report:dashboard` -> View unified history of past Allure/Cucumber reports.
+- `npm run report:history`   -> List archived report versions.
 - `npm run report:generate`  -> Generate Allure report from current results.
+- `npm run cucumber:report`  -> Generate and open Cucumber HTML report.
 - `npm run steps:check`      -> Verify all Gherkin steps are implemented.
+- `npm run imports:fix`     -> Automatically add missing imports to step definitions.
 - `npm run format`           -> Auto-format code using Prettier.
 - `npm run lint`             -> Check for code quality issues.
 
@@ -66,9 +72,10 @@ npm run test:api
 ## 6) Add a Test Scenario
 
 1. Create a `.feature` file in `src/tests/features/`.
-2. Implement matching steps in `src/tests/stepDefinitions/`.
-3. Use or create Page Objects in `src/pages/` for UI interactions.
-4. Run `npm run test` (or use tags for isolation).
+2. Generate step skeletons: `npm run steps:generate -- --feature src/tests/features/my.feature`
+3. Implement matching steps in `src/tests/stepDefinitions/`.
+4. Use or create Page Objects in `src/pages/` for UI interactions.
+5. Run `npm run test` (or use tags for isolation).
 
 ## 7) Notes
 
