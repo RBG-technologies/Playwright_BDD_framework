@@ -79,11 +79,65 @@ function ensureEnvFile() {
     return;
   }
 
-  if (!fs.existsSync(envPath)) {
-    fs.copyFileSync(examplePath, envPath);
-    console.log("Created playwright-bdd-framework/.env from .env.example");
+  // 1. Read .env.example (the template)
+  const templateLines = fs.readFileSync(examplePath, "utf-8").split(/\r?\n/);
+
+  // 2. Parse existing .env if it exists
+  const existingValues = new Map();
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, "utf-8");
+    envContent.split(/\r?\n/).forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("#") && trimmed.includes("=")) {
+        const [key, ...valueParts] = trimmed.split("=");
+        existingValues.set(key.trim(), valueParts.join("=").trim());
+      }
+    });
+  }
+
+  // 3. Merge: iterate template, use existing value if present
+  const resultLines = [];
+  const handledKeys = new Set();
+
+  for (const line of templateLines) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#") && trimmed.includes("=")) {
+      const [key] = trimmed.split("=");
+      const keyName = key.trim();
+      handledKeys.add(keyName);
+      
+      if (existingValues.has(keyName)) {
+        resultLines.push(`${keyName}=${existingValues.get(keyName)}`);
+      } else {
+        resultLines.push(line);
+      }
+    } else {
+      // Keep comments, empty lines exactly as they are in the template
+      resultLines.push(line);
+    }
+  }
+
+  // 4. Append custom variables from .env that are NOT in .env.example
+  const extras = [];
+  for (const [key, value] of existingValues.entries()) {
+    if (!handledKeys.has(key)) {
+      extras.push(`${key}=${value}`);
+    }
+  }
+
+  if (extras.length > 0) {
+    resultLines.push("");
+    resultLines.push("# --- Custom / Dynamic Variables (Preserved from existing .env) ---");
+    resultLines.push(...extras);
+  }
+
+  // 5. Write back to .env
+  fs.writeFileSync(envPath, resultLines.join("\n"), "utf-8");
+  
+  if (existingValues.size > 0) {
+    console.log("Synchronized playwright-bdd-framework/.env with .env.example (preserved your values and comments).");
   } else {
-    console.log("playwright-bdd-framework/.env already exists. Keeping current values.");
+    console.log("Created playwright-bdd-framework/.env from .env.example.");
   }
 }
 
