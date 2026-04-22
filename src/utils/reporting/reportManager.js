@@ -6,6 +6,8 @@ import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
 const cucumberHtmlReporter = require("multiple-cucumber-html-reporter");
+import http from "http";
+import { spawn } from "child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -185,31 +187,213 @@ export function generateHistoryDashboard() {
 
   const runs = entries.map(folder => {
       const archivePath = path.join(HISTORY_DIR, folder);
+      const stats = fs.statSync(archivePath);
       return {
           folder,
+          mtime: stats.mtime,
+          displayDate: stats.mtime.toLocaleString(),
           hasAllure: fs.existsSync(path.join(archivePath, "allure", "index.html")),
           hasCucumber: fs.existsSync(path.join(archivePath, "cucumber", "index.html"))
       };
-  });
+  }).sort((a, b) => b.mtime - a.mtime);
 
-  const html = `<!DOCTYPE html><html><head><title>Test History</title>
-  <style>
-    body { font-family: sans-serif; background: #0f172a; color: #fff; padding: 2rem; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
-    .card { background: #1e293b; padding: 1rem; border-radius: 0.5rem; border: 1px solid #334155; }
-    a { color: #38bdf8; text-decoration: none; margin-right: 1rem; }
-    a:hover { text-decoration: underline; }
-  </style></head><body>
-  <h1>Test History Dashboard</h1>
-  <div class="grid">${runs.map(r => `
-    <div class="card">
-      <h3>${r.folder}</h3>
-      ${r.hasAllure ? `<a href="./${r.folder}/allure/index.html">Allure</a>` : ""}
-      ${r.hasCucumber ? `<a href="./${r.folder}/cucumber/index.html">Cucumber</a>` : ""}
-    </div>`).join("")}</div>
-  </body></html>`;
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test History Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: #334155;
+            --hover-bg: #2d3e5a;
+        }
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { 
+            margin-bottom: 3rem; 
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 { font-size: 2rem; margin: 0; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stats { color: var(--text-dim); font-size: 0.9rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+        .card { 
+            background: var(--card-bg); 
+            padding: 1.5rem; 
+            border-radius: 1rem; 
+            border: 1px solid var(--border); 
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover { 
+            transform: translateY(-5px); 
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent);
+            opacity: 0.5;
+        }
+        .card h3 { 
+            margin: 0 0 0.5rem 0; 
+            font-size: 1.1rem; 
+            word-break: break-all;
+            color: var(--text-main);
+        }
+        .card .date { 
+            font-size: 0.85rem; 
+            color: var(--text-dim); 
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .links { display: flex; gap: 0.75rem; }
+        .btn { 
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-allure { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .btn-allure:hover { background: rgba(56, 189, 248, 0.2); }
+        .btn-cucumber { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .btn-cucumber:hover { background: rgba(34, 197, 94, 0.2); }
+        .empty-state { text-align: center; padding: 4rem; color: var(--text-dim); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Test History Dashboard</h1>
+                <p class="stats">Showing ${runs.length} recent executions</p>
+            </div>
+            <div class="stats">Last updated: ${new Date().toLocaleString()}</div>
+        </header>
+        <div class="grid">
+            ${runs.length === 0 ? '<div class="empty-state">No archived reports yet.</div>' : runs.map(r => `
+            <div class="card">
+                <h3>${r.folder.split('_')[0]}</h3>
+                <div class="date"><i class="far fa-clock"></i> ${r.displayDate}</div>
+                <div class="links">
+                    ${r.hasAllure ? `<a href="./${r.folder}/allure/index.html" class="btn btn-allure"><i class="fas fa-chart-line"></i> Allure</a>` : ""}
+                    ${r.hasCucumber ? `<a href="./${r.folder}/cucumber/index.html" class="btn btn-cucumber"><i class="fas fa-leaf"></i> Cucumber</a>` : ""}
+                </div>
+            </div>`).join("")}
+        </div>
+    </div>
+</body>
+</html>`;
 
   fs.writeFileSync(DASHBOARD_PATH, html);
+}
+
+/**
+ * Watch for changes in history directory and regenerate dashboard.
+ */
+export function watchHistory() {
+  if (!fs.existsSync(HISTORY_DIR)) {
+    fs.mkdirSync(HISTORY_DIR, { recursive: true });
+  }
+  
+  console.log(`\n👀 WATCHING: ${HISTORY_DIR}`);
+  console.log("Press Ctrl+C to stop.\n");
+
+  let timeout;
+  fs.watch(HISTORY_DIR, { recursive: false }, (eventType, filename) => {
+    if (filename && filename !== "index.html") {
+      // Debounce to handle multiple rapid changes (like dir copy)
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        console.log(`🔄 Change detected (${eventType}): ${filename}. Regenerating dashboard...`);
+        generateHistoryDashboard();
+      }, 500);
+    }
+  });
+  
+  // Initial generation
+  generateHistoryDashboard();
+}
+
+/**
+ * Start a local server to serve report history dynamically.
+ */
+export function serveHistory(port = 3000) {
+  const server = http.createServer((req, res) => {
+    const url = req.url === "/" ? "/index.html" : req.url;
+    
+    // For root/index.html, serve a dynamic version
+    if (url === "/index.html") {
+      generateHistoryDashboard(); // Ensure we have latest data
+      if (fs.existsSync(DASHBOARD_PATH)) {
+        res.writeHead(200, { "Content-Type": "text/html" });
+        return res.end(fs.readFileSync(DASHBOARD_PATH));
+      }
+    }
+
+    // Serve static files from HISTORY_DIR
+    const filePath = path.join(HISTORY_DIR, url.replace(/^\//, ""));
+    if (fs.existsSync(filePath)) {
+      const stats = fs.statSync(filePath);
+      if (stats.isFile()) {
+        const ext = path.extname(filePath).toLowerCase();
+        const mimeTypes = {
+          ".html": "text/html",
+          ".js": "text/javascript",
+          ".css": "text/css",
+          ".json": "application/json",
+          ".png": "image/png",
+          ".jpg": "image/jpeg",
+          ".gif": "image/gif",
+          ".svg": "image/svg+xml"
+        };
+        res.writeHead(200, { "Content-Type": mimeTypes[ext] || "application/octet-stream" });
+        return res.end(fs.readFileSync(filePath));
+      }
+    }
+
+    res.writeHead(404);
+    res.end("Not Found");
+  });
+
+  server.listen(port, () => {
+    console.log(`\n🚀 HISTORY SERVER RUNNING: http://localhost:${port}`);
+    console.log("Serving dynamic test results from report-history folder.");
+    console.log("Press Ctrl+C to stop.\n");
+    
+    // Auto-open in browser
+    const cmd = process.platform === "win32" ? "start" : process.platform === "darwin" ? "open" : "xdg-open";
+    spawn(cmd, [`http://localhost:${port}`], { shell: true });
+  });
 }
 
 /**
@@ -231,6 +415,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (args.includes("--archive")) archiveReports();
   if (args.includes("--history")) listHistory();
   if (args.includes("--dashboard")) generateHistoryDashboard();
+  if (args.includes("--watch")) watchHistory();
+  if (args.includes("--serve")) serveHistory();
   if (args.includes("--cucumber")) generateCucumberReport();
   if (args.includes("--print")) printSummary();
   if (args.includes("--open-cucumber")) {
