@@ -1,20 +1,14 @@
-import { runtimeConfig } from "../config/runtimeConfig.ts";
-import { PlaywrightAssertions } from "./playwrightAssertions.ts";
+import { expect } from "@playwright/test";
 import type { Locator, Page } from "playwright";
-
-import type { RuntimeConfig } from "../config/runtimeConfig.ts";
-import { highlightElement } from "./highlight.ts";
+import type { RuntimeConfig } from "../../config/runtimeConfig.ts";
 
 export type LocatorTarget = string | Locator;
 type SelectOptionInput = Parameters<Locator["selectOption"]>[0];
 
 /**
- * PlaywrightActions — base class for all page objects.
- * Contains generic browser interaction methods (click, fill, check, etc.).
- * Extended by PlaywrightAssertions which adds expectXxx() assertion helpers.
- * All page objects should extend PlaywrightAssertions to get both.
+ * WebActions — base class for browser interactions.
  */
-export class PlaywrightActions {
+export class WebActions {
   protected readonly page: Page;
   protected readonly runtime: RuntimeConfig;
 
@@ -29,8 +23,6 @@ export class PlaywrightActions {
 
   protected async highlight(target: LocatorTarget): Promise<void> {
     const loc = this.locator(target);
-
-    // Remove previous target tags and add to current one for the After hook to find
     await this.page.evaluate(() => {
       document.querySelectorAll(".automation-target").forEach((el) => el.classList.remove("automation-target"));
     }).catch(() => { });
@@ -42,11 +34,6 @@ export class PlaywrightActions {
     }).catch(() => { });
 
     if (!this.runtime.highlightElements) return;
-
-    if (typeof target === "string") {
-      await highlightElement(this.page, target, true);
-      return;
-    }
   }
 
   async goto(url: string): Promise<void> {
@@ -60,20 +47,13 @@ export class PlaywrightActions {
   async waitForEnabled(target: LocatorTarget, timeout = this.runtime.actionTimeoutMs): Promise<void> {
     const locator = this.locator(target);
     await locator.waitFor({ state: "visible", timeout });
-
-    // Poll until enabled or timeout is reached
     const startTime = Date.now();
     while (Date.now() - startTime < timeout) {
-      if (await locator.isEnabled().catch(() => false)) {
-        return;
-      }
+      if (await locator.isEnabled().catch(() => false)) return;
       await this.page.waitForTimeout(200);
     }
-    // If we reach here, it didn't become enabled, but we avoid throwing blindly in case they catch it.
-    // Playwright actions automatically wait for actionability anyway.
   }
 
-  // A cleaner approach for enabled:
   async checkEnabled(target: LocatorTarget): Promise<boolean> {
     return await this.locator(target).isEnabled();
   }
@@ -82,27 +62,12 @@ export class PlaywrightActions {
     await this.page.waitForTimeout(timeoutMs);
   }
 
-  // Predefined specific timeout shortcuts
-  async W5(): Promise<void> {
-    await this.page.waitForTimeout(500);
-  }
-  async W10(): Promise<void> {
-    await this.page.waitForTimeout(1000);
-  }
-  async W20(): Promise<void> {
-    await this.page.waitForTimeout(2000);
-  }
-  async W30(): Promise<void> {
-    await this.page.waitForTimeout(3000);
-  }
-  async W40(): Promise<void> {
-    await this.page.waitForTimeout(4000);
-  }
-  async W50(): Promise<void> {
-    await this.page.waitForTimeout(5000);
-  }
-  async W100(): Promise<void> {
-    await this.page.waitForTimeout(10000);
+  /**
+   * Pause execution for a specific number of seconds.
+   * @param seconds Number of seconds to wait.
+   */
+  async wait(seconds: number): Promise<void> {
+    await this.page.waitForTimeout(seconds * 1000);
   }
 
   async waitForUrl(url: string | RegExp, timeout = this.runtime.navigationTimeoutMs): Promise<void> {
@@ -178,11 +143,7 @@ export class PlaywrightActions {
     await this.locator(source).dragTo(this.locator(target));
   }
 
-  async dispatchEvent(
-    target: LocatorTarget,
-    type: string,
-    eventInit?: Record<string, unknown>
-  ): Promise<void> {
+  async dispatchEvent(target: LocatorTarget, type: string, eventInit?: Record<string, unknown>): Promise<void> {
     await this.locator(target).dispatchEvent(type, eventInit);
   }
 
@@ -244,5 +205,88 @@ export class PlaywrightActions {
 
   async screenshot(filePath: string, fullPage = true): Promise<void> {
     await this.page.screenshot({ path: filePath, fullPage });
+  }
+}
+
+/**
+ * WebAssertions extends WebActions with typed, named assertion methods.
+ */
+export class WebAssertions extends WebActions {
+  /** Assert element is visible on the page */
+  async expectVisible(target: LocatorTarget, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toBeVisible({ timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert element is NOT visible */
+  async expectNotVisible(target: LocatorTarget, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toBeHidden({ timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert element has exact inner text */
+  async expectText(target: LocatorTarget, text: string, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toHaveText(text, { timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert element contains the given substring */
+  async expectContainsText(target: LocatorTarget, text: string, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toContainText(text, { timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert input/textarea has the given value */
+  async expectInputValue(target: LocatorTarget, value: string, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toHaveValue(value, { timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert checkbox or radio button is checked */
+  async expectChecked(target: LocatorTarget, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toBeChecked({ timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert checkbox or radio button is NOT checked */
+  async expectNotChecked(target: LocatorTarget, message?: string): Promise<void> {
+    await expect(this.locator(target), message).not.toBeChecked({ timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert element is enabled */
+  async expectEnabled(target: LocatorTarget, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toBeEnabled({ timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert element is disabled */
+  async expectDisabled(target: LocatorTarget, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toBeDisabled({ timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert element attribute equals value */
+  async expectAttribute(target: LocatorTarget, attr: string, value: string, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toHaveAttribute(attr, value, { timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert element attribute contains substring */
+  async expectAttributeContains(target: LocatorTarget, attr: string, substring: string): Promise<void> {
+    const actual = await this.locator(target).getAttribute(attr);
+    expect(actual, `Expected attribute "${attr}" to contain "${substring}", got "${actual}"`).toContain(substring);
+  }
+
+  /** Assert the number of matching elements */
+  async expectCount(target: LocatorTarget, count: number, message?: string): Promise<void> {
+    await expect(this.locator(target), message).toHaveCount(count, { timeout: this.runtime.actionTimeoutMs });
+  }
+
+  /** Assert current page URL contains the given substring */
+  async expectUrlContains(substring: string, message?: string): Promise<void> {
+    await expect(this.page, message).toHaveURL(new RegExp(substring.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), {
+      timeout: this.runtime.navigationTimeoutMs,
+    });
+  }
+
+  /** Assert current page URL matches exactly */
+  async expectUrl(url: string | RegExp, message?: string): Promise<void> {
+    await expect(this.page, message).toHaveURL(url, { timeout: this.runtime.navigationTimeoutMs });
+  }
+
+  /** Assert page title matches */
+  async expectTitle(title: string | RegExp, message?: string): Promise<void> {
+    await expect(this.page, message).toHaveTitle(title, { timeout: this.runtime.navigationTimeoutMs });
   }
 }

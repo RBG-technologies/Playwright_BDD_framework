@@ -31,7 +31,10 @@ src/
 		stepDefinitions/ -> Step implementations
 		hooks/        -> Browser/Context lifecycle hooks
 		support/      -> Custom world and shared context
-	utils/            -> Helpers (assertions, reports, step checks)
+	utils/
+		automation/   -> webActions, apiActions, dataReader
+		reporting/    -> Report cleanup, archive, generation
+		dev-tools/    -> Maintenance, generation, helpers
 scripts/              -> Setup and utility scripts
 ```
 

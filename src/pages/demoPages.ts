@@ -1,10 +1,9 @@
-import { runtimeConfig } from "../config/runtimeConfig.ts";
 import { Page, expect } from "@playwright/test";
 import type { RuntimeConfig } from "../config/runtimeConfig.ts";
-import { PlaywrightActions } from "../utils/playwrightActions.ts";
+import { WebActions } from "../utils/automation/webActions.ts";
 
 
-export class PlaygroundPage extends PlaywrightActions {
+export class PlaygroundPage extends WebActions {
     constructor(page: Page, runtime: RuntimeConfig) {
         super(page, runtime);
     }
