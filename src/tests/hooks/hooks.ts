@@ -7,7 +7,7 @@ import {
   setDefaultTimeout,
   Status
 } from "@cucumber/cucumber";
-import { chromium, firefox, webkit } from "playwright";
+import { chromium, firefox, request, webkit } from "playwright";
 import type { Browser } from "playwright";
 import fs from "fs";
 import path from "path";
@@ -63,6 +63,10 @@ Before(async function (this: CustomWorld, { pickle }) {
   }
 
   this.page = await this.context.newPage();
+  this.apiRequest = await request.newContext({
+    baseURL: runtimeConfig.apiBaseUrl,
+    ignoreHTTPSErrors: true
+  });
   this.formData = {};
 });
 
@@ -94,6 +98,7 @@ After(async function (this: CustomWorld, { result, pickle }) {
 
   const recordedVideo = runtimeConfig.recordVideo && this.page ? this.page.video() : null;
 
+  await this.apiRequest?.dispose();
   await this.context?.close();
 
   // Attach video after context is closed (Playwright finalizes video on close)

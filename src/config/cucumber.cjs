@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const configuredFeaturePath = process.env.FEATURE_PATH;
+const configuredTags = process.env.TAGS;
 
 module.exports = {
   default: {

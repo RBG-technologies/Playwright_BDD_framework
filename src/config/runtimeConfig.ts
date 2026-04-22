@@ -29,6 +29,7 @@ const envSchema = z.object({
   ATTACH_SCREENSHOTS: z.preprocess(trimString, z.string().optional().transform(boolFlag)),
   RECORD_VIDEO: z.preprocess(trimString, z.string().optional().transform(boolFlag)),
   ALLURE_RESULTS_DIR: z.preprocess(trimString, z.string().default("allure-results")),
+  API_BASE_URL: z.preprocess(trimString, z.string().url().optional()),
 });
 
 // ─── Validation (fail fast on bad values) ─────────────────────────────────────
@@ -96,6 +97,7 @@ export interface RuntimeConfig {
   recordVideo: boolean;
   allureResultsDir: string;
   urls: Record<string, string>;
+  apiBaseUrl?: string;
 }
 
 // ─── Exported config ──────────────────────────────────────────────────────────
@@ -122,4 +124,5 @@ export const runtimeConfig: RuntimeConfig = {
   recordVideo: env.RECORD_VIDEO,
   allureResultsDir: env.ALLURE_RESULTS_DIR,
   urls: allUrls,
+  apiBaseUrl: env.API_BASE_URL,
 };

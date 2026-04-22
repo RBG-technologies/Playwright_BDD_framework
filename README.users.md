@@ -77,7 +77,14 @@ npm run test:dry
 4. Use or create Page Objects in `src/pages/` for UI interactions.
 5. Run `npm run test` (or use tags for isolation).
 
-## 7) Notes
+## 8) Data-Driven Testing
+
+- **Scenario Outlines**: Use `Scenario Outline` with `Examples` table in `.feature` files.
+- **External Data**: Load JSON/CSV from `src/tests/data/` using `DataReader.readJson('file.json')`.
+- **Dynamic Data**: Use `TestDataFactory` for random test data.
+- **API Testing**: Use `ApiActions` in step definitions for REST API validation.
+
+## 9) Notes
 
 - **Report History**: Archived reports are stored in `report-history/`.
 - **Environment**: Keep `.env` local; do not commit secrets.
