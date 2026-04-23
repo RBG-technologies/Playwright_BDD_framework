@@ -1,4 +1,5 @@
 require("dotenv").config();
+console.log("DEBUG: Loading Cucumber Config...");
 
 const configuredFeaturePath = process.env.FEATURE_PATH;
 const configuredTags = process.env.TAGS;

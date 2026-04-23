@@ -16,7 +16,7 @@ import type { CustomWorld } from "../support/customWorld.ts";
 
 setDefaultTimeout(runtimeConfig.timeoutMs);
 
-let sharedBrowser: Browser;
+export let sharedBrowser: Browser;
 
 const browserFactory = {
   chromium,
@@ -36,8 +36,7 @@ BeforeAll(async function () {
   sharedBrowser = await launcher.launch(launchOptions);
 });
 
-Before(async function (this: CustomWorld, { pickle }) {
-  console.log(`\n🚀 Scenario: ${pickle.name}`);
+export function getContextOptions() {
   const testResultsDir = path.resolve(process.cwd(), "test-results");
   const videoDir = path.join(testResultsDir, "videos");
   if (!fs.existsSync(videoDir)) {
@@ -53,16 +52,27 @@ Before(async function (this: CustomWorld, { pickle }) {
   if (runtimeConfig.baseUrl) {
     contextOptions.baseURL = runtimeConfig.baseUrl;
   }
+  return contextOptions;
+}
 
-  this.context = await sharedBrowser.newContext(contextOptions);
-  this.context.setDefaultTimeout(runtimeConfig.actionTimeoutMs);
-  this.context.setDefaultNavigationTimeout(runtimeConfig.navigationTimeoutMs);
+export async function initContext(world: CustomWorld) {
+  const contextOptions = getContextOptions();
+
+  world.context = await sharedBrowser.newContext(contextOptions);
+  world.context.setDefaultTimeout(runtimeConfig.actionTimeoutMs);
+  world.context.setDefaultNavigationTimeout(runtimeConfig.navigationTimeoutMs);
 
   if (runtimeConfig.trace) {
-    await this.context.tracing.start({ screenshots: true, snapshots: true });
+    await world.context.tracing.start({ screenshots: true, snapshots: true });
   }
 
-  this.page = await this.context.newPage();
+  world.page = await world.context.newPage();
+  return world.page;
+}
+
+Before(async function (this: CustomWorld, { pickle }) {
+  console.log(`\n🚀 Scenario: ${pickle.name}`);
+  await initContext(this);
   this.apiRequest = await request.newContext({
     baseURL: runtimeConfig.apiBaseUrl,
     ignoreHTTPSErrors: true

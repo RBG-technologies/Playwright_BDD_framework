@@ -1,3 +1,3 @@
-firstName,lastName,email
-John,Doe,john.doe@example.com
-Jane,Smith,jane.smith@example.com
+firstName,lastName,email,password
+John,Doe,john.doe@example.com,password123
+Jane,Smith,jane.smith@example.com,user456

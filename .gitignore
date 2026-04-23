@@ -10,8 +10,12 @@ node_modules/
 test-results/
 src/tests/features/*
 !src/tests/features/Demo.feature
+!src/tests/features/ApiDemo.feature
+!src/tests/features/DemoCsv_DD.feature  
 src/tests/stepDefinitions/*
 !src/tests/stepDefinitions/demoStepDef.ts
+!src/tests/stepDefinitions/apiSteps.ts
+
 src/pages/*
 !src/pages/demoPages.ts
 

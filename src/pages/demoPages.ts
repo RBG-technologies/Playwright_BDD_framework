@@ -2,20 +2,19 @@ import { Page, expect } from "@playwright/test";
 import type { RuntimeConfig } from "../config/runtimeConfig.ts";
 import { WebActions } from "../utils/automation/webActions.ts";
 
-
 export class PlaygroundPage extends WebActions {
     constructor(page: Page, runtime: RuntimeConfig) {
         super(page, runtime);
     }
 
     // Locators
-    nameInput = this.page.locator('#text-input');
-    passwordInput = this.page.locator('#password-input');
-    emailInput = this.page.locator('#email-input');
-    phoneInput = this.page.locator('#mobile-input');
-    textInput = this.page.locator('#textarea-input');
-    submitBtn = this.page.locator('#submit-btn');
-    message = this.page.locator('#s1-msg');
+    nameInput = '#text-input';
+    passwordInput = '#password-input';
+    emailInput = '#email-input';
+    phoneInput = '#mobile-input';
+    textInput = '#textarea-input';
+    submitBtn = '#submit-btn';
+    message = '#s1-msg';
 
     // Actions
     async navigate() {
@@ -43,7 +42,7 @@ export class PlaygroundPage extends WebActions {
     }
 
     async validateMessage(expected: string) {
-        await expect(this.message).toHaveText(expected);
+        await expect(this.page.locator(this.message)).toHaveText(expected);
     }
 
     async enterEmail(email: string) {
