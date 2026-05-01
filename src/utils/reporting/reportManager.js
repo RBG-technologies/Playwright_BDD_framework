@@ -231,7 +231,7 @@ export function generateHistoryDashboard() {
             justify-content: space-between;
             align-items: center;
         }
-        h1 { font-size: 2rem; margin: 0; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h1 { font-size: 2rem; margin: 0; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         .stats { color: var(--text-dim); font-size: 0.9rem; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
         .card { 

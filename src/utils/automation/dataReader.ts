@@ -35,4 +35,42 @@ export class DataReader {
 
     return results;
   }
+
+  /**
+   * Runs a Data-Driven Test loop with automatic screenshot capture.
+   * @param data Array of records to iterate over
+   * @param world The Cucumber World instance (provides attach/page)
+   * @param logic Callback containing the test logic for each record
+   */
+  static async runDDT(
+    data: any[],
+    world: any,
+    logic: (record: any, index: number) => Promise<void>
+  ): Promise<void> {
+    const screenshotDir = path.resolve(process.cwd(), "test-results", "screenshots");
+    if (!fs.existsSync(screenshotDir)) {
+      fs.mkdirSync(screenshotDir, { recursive: true });
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      const record = data[i];
+      // Execute the test logic for this record
+      await logic(record, i);
+
+      // Capture screenshot after iteration logic
+      if (world.page) {
+        const timestamp = new Date().getTime();
+        const screenshotName = `iteration_${i + 1}_${timestamp}.png`;
+        const screenshotPath = path.join(screenshotDir, screenshotName);
+
+        const screenshot = await world.page.screenshot({
+          path: screenshotPath,
+        });
+
+        // Attach to Cucumber report
+        await world.attach(screenshot, "image/png");
+        console.log(`  📸 Screenshot saved: ${screenshotName}`);
+      }
+    }
+  }
 }

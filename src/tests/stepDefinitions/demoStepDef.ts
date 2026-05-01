@@ -53,9 +53,7 @@ Given("user loads demo data from {string}", async function (this: CustomWorld, f
 When("user submits the form with loaded demo data", async function (this: CustomWorld) {
   const records = this.formData["loadedDemoData"] as any[];
 
-  for (let i = 0; i < records.length; i++) {
-    const record = records[i];
-
+  await DataReader.runDDT(records, this, async (record: any, i: number) => {
     // For every record after the first one, we reset the context to "open freshly"
     if (i > 0) {
       console.log(`\n♻ Resetting context for record ${i + 1} (${record.name})...`);
@@ -79,16 +77,5 @@ When("user submits the form with loaded demo data", async function (this: Custom
     await this.pages.playground.enterText(record.text);
     await this.pages.playground.clickSubmit();
     await this.pages.playground.validateMessage("Submitted");
-
-    // Capture and attach screenshot for each iteration
-    const screenshot = await this.page.screenshot({ fullPage: true });
-    
-    // Attach to Allure (specifically supports multiple attachments per step)
-    allure.attachment(`Iteration ${i + 1}: ${record.name}`, screenshot, "image/png");
-    
-    // Attach to Cucumber report
-    await this.attach(screenshot, "image/png");
-    
-    console.log(`  📸 Screenshot attached for: ${record.name}`);
-  }
+  });
 });

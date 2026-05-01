@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBG technologies - QA Automation Practice Playground</title>
+    <!-- Code Comments: 
+  This playground provides 30 sections of elements built with pure HTML, CSS, and Vanilla JS.
+  It requires no internet connection and no external libraries.
+  Useful for practicing locator strategies, DOM traversal, and action simulations.
+-->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            padding: 40px 20px;
+            color: #2d3436;
+            margin: 0;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            margin-top: 0;
+            padding-bottom: 15px;
+            color: #2d3436;
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 16px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+        }
+
+        .group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: #636e72;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="file"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 16px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: #2d3436;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #6c5ce7;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5b4bc4 0%, #8c82ff 100%);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background: #dfe6e9;
+            color: #b2bec3;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .status-msg {
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #00b894;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        table {
+            width: 100%;
+            max-width: 600px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95rem;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        th {
+            background: rgba(108, 92, 231, 0.05);
+            font-weight: 600;
+            color: #2d3436;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        th:hover {
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(45, 52, 54, 0.6);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .drop-zone {
+            width: 100%;
+            max-width: 300px;
+            height: 100px;
+            border: 2px dashed #b2bec3;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #636e72;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .draggable {
+            width: 120px;
+            height: 50px;
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: grab;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(232, 67, 147, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            min-width: 150px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            z-index: 10;
+            overflow: hidden;
+            top: 110%;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .dropdown-content p {
+            margin: 0;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            color: #2d3436;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content p:hover {
+            background: #f1f2f6;
+            color: #6c5ce7;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 2px dotted #6c5ce7;
+            color: #6c5ce7;
+            font-weight: 600;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 140px;
+            background: #2d3436;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #2d3436 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .resizable {
+            width: 180px;
+            height: 100px;
+            border: 2px dashed #6c5ce7;
+            background: rgba(108, 92, 231, 0.05);
+            resize: both;
+            overflow: auto;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 120px;
+            min-height: 60px;
+            color: #6c5ce7;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>RBG technologies - QA Automation Practice Playground</h1>
+
+    <!-- SECTION 1 -->
+    <div class="section" id="section-1">
+        <h2>Section 1: Basic Elements</h2>
+        <div class="group"><label>Name</label><input type="text" id="text-input" name="user_name" class="form-input"
+                data-testid="test-text" aria-label="Name" placeholder="Enter Name"></div>
+        <div class="group"><label>Email</label><input type="email" id="email-input"
+                placeholder="mail@rbgtechnologies.com"></div>
+        <div class="group"><label>Password</label><input type="password" id="password-input"
+                placeholder="Enter Password"></div>
+        <div class="group"><label>Phone</label><input type="tel" id="mobile-input" placeholder="123-456-7890"></div>
+        <div class="group"><label>Textarea</label><textarea id="textarea-input" placeholder="Type here..."></textarea>
+        </div>
+        <button id="submit-btn" onclick="document.getElementById('s1-msg').innerText='Submitted'">Submit</button>
+        <button id="reset-btn" onclick="document.getElementById('s1-msg').innerText='Reset'">Reset</button>
+        <div id="s1-msg" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section" id="section-2">
+        <h2>Section 2: Button Interactions</h2>
+        <button id="click-btn" onclick="document.getElementById('s2-msg').innerText='Normal Clicked'">Normal
+            Click</button>
+        <button id="dblclick-btn" ondblclick="document.getElementById('s2-msg').innerText='Double Clicked'">Double
+            Click</button>
+        <button id="rightclick-btn"
+            oncontextmenu="event.preventDefault(); document.getElementById('s2-msg').innerText='Right Clicked'">Right
+            Click</button><br><br>
+        <button id="disabled-btn" disabled>Disabled Button</button>
+        <button id="enable-delay-btn"
+            onclick="setTimeout(()=>document.getElementById('disabled-btn').disabled=false, 2000)">Enable after 2s
+            delay</button>
+        <button id="change-text-btn" onclick="this.innerText='Text has Changed!'">Change Text Content</button>
+        <div id="s2-msg" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section" id="section-3">
+        <h2>Section 3: Checkboxes and Radio Buttons</h2>
+        <div class="group">
+            <label><input type="checkbox" id="check-all"
+                    onclick="document.querySelectorAll('.multi-cb').forEach(c=>c.checked=this.checked)"> Select
+                All</label>
+            <div style="margin-left: 15px;">
+                <label><input type="checkbox" class="multi-cb" value="1"> Checkbox 1</label>
+                <label><input type="checkbox" class="multi-cb" value="2"> Checkbox 2</label>
+            </div>
+        </div>
+        <div class="group">
+            <label>Radio Options:</label>
+            <label><input type="radio" name="radio-group" id="radio-op1" value="A"> Option A</label>
+            <label><input type="radio" name="radio-group" id="radio-op2" value="B"> Option B</label>
+        </div>
+        <div class="group">
+            <label><input type="checkbox" id="reveal-check"
+                    onclick="document.getElementById('s3-msg').classList.toggle('hidden')"> Click to reveal hidden
+                text</label>
+        </div>
+        <div id="s3-msg" class="status-msg hidden">Hidden secret revealed</div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section" id="section-4">
+        <h2>Section 4: Dropdowns</h2>
+        <div class="group"><label>Standard Select</label><select id="std-dropdown">
+                <option value="">Select...</option>
+                <option value="opt1">Option 1</option>
+                <option value="opt2">Option 2</option>
+            </select></div>
+        <div class="group"><label>Multi Select</label><select id="multi-dropdown" multiple size="3">
+                <option>Apple</option>
+                <option>Orange</option>
+                <option>Banana</option>
+            </select></div>
+        <div class="group">
+            <label>Custom Div Dropdown</label>
+            <div class="dropdown">
+                <button id="custom-dropdown-btn">Hover for Options</button>
+                <div class="dropdown-content">
+                    <p id="dd-op-1" onclick="document.getElementById('s4-msg').innerText='Custom 1 selected'">Custom
+                        Option 1</p>
+                    <p id="dd-op-2" onclick="document.getElementById('s4-msg').innerText='Custom 2 selected'">Custom
+                        Option 2</p>
+                </div>
+            </div>
+        </div>
+        <div class="group">
+            <button
+                onclick="document.getElementById('dyn-dropdown').innerHTML='<option>Populated 1</option><option>Populated 2</option>'">Populate
+                Dynamic Dropdown</button>
+            <select id="dyn-dropdown" style="margin-top: 5px;">
+                <option value="">Empty</option>
+            </select>
+        </div>
+        <div id="s4-msg" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section" id="section-5">
+        <h2>Section 5: Locator Practice</h2>
+        <div id="parent-locator" class="locator-class" name="locator-name" data-testid="locator-id"
+            aria-label="locator-aria">
+            <p class="partial-match-txt">Locate by partial text match</p>
+            <div class="nested-level-1">
+                <span class="sibling-1">Sibling One</span>
+                <button id="target-loc-btn">Identify Me Structurally</button>
+                <span class="sibling-2">Sibling Two</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="section" id="section-6">
+        <h2>Section 6: Dynamic Content</h2>
+        <button onclick="setTimeout(()=>document.getElementById('dyn-appear').classList.remove('hidden'), 2000)">Appear
+            after 2s</button>
+        <span id="dyn-appear" class="hidden status-msg">Appeared successfully!</span><br><br>
+
+        <button onclick="this.classList.add('hidden')">Click to disappear</button><br><br>
+
+        <button onclick="document.getElementById('dyn-text').innerText='Content Dynamically Updated!'">Change Text
+            Dynamically</button>
+        <span id="dyn-text" style="margin-left: 10px;">Original static text</span><br><br>
+
+        <button onclick="let c=document.getElementById('dyn-counter'); c.innerText=parseInt(c.innerText)+1">Increment
+            Counter</button>
+        <span style="font-weight:bold; margin-left: 10px;">Count: <span id="dyn-counter">0</span></span><br><br>
+
+        <button
+            onclick="document.getElementById('dyn-load').innerHTML='<div class=\'status-msg\'>Loaded Async Content</div>'">Load
+            Content</button>
+        <div id="dyn-load" style="margin-top: 5px;"></div>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="section" id="section-7">
+        <h2>Section 7: Waits and Synchronization</h2>
+        <button
+            onclick="document.getElementById('spinner').style.display='inline-block'; document.getElementById('spin-msg').classList.add('hidden'); setTimeout(()=>{document.getElementById('spinner').style.display='none'; document.getElementById('spin-msg').classList.remove('hidden');}, 2500)">Simulate
+            Spinner Load</button>
+        <div id="spinner"
+            style="display:none; width: 20px; height: 20px; border: 3px solid #ccc; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; vertical-align: middle; margin-left: 10px;">
+        </div>
+        <span id="spin-msg" class="hidden status-msg">Data Loaded</span><br><br>
+
+        <button
+            onclick="setTimeout(()=>document.getElementById('delay-text').innerText='Delay Completed', 2000)">Trigger
+            Delayed Text</button>
+        <span id="delay-text" style="font-weight:bold; margin-left:10px;">Waiting...</span><br><br>
+
+        <button
+            onclick="let p=document.getElementById('progress'); let v=0; let i=setInterval(()=>{v+=10; p.value=v; if(v>=100) clearInterval(i);}, 200)">Start
+            Progress Bar</button>
+        <progress id="progress" value="0" max="100" style="margin-left: 10px;"></progress>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+                padding: 40px 20px;
+                color: #2d3436;
+                margin: 0;
+                box-sizing: border-box;
+                min-height: 100vh;
+            }
+
+            h1 {
+                text-align: center;
+                font-size: 2.8rem;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: 40px;
+                font-weight: 800;
+                letter-spacing: -1px;
+            }
+
+            h2 {
+                margin-top: 0;
+                padding-bottom: 15px;
+                color: #2d3436;
+                font-size: 1.4rem;
+                font-weight: 600;
+                border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            }
+
+            .section {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.8);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+                padding: 30px;
+                margin-bottom: 30px;
+                border-radius: 16px;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .section:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+            }
+
+            .group {
+                margin-bottom: 20px;
+            }
+
+            label {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 8px;
+                font-size: 0.95rem;
+                color: #636e72;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            input[type="email"],
+            input[type="tel"],
+            input[type="file"],
+            input[type="date"],
+            select,
+            textarea {
+                width: 100%;
+                max-width: 400px;
+                padding: 12px 16px;
+                border: 2px solid transparent;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 8px;
+                box-sizing: border-box;
+                font-family: inherit;
+                font-size: 0.95rem;
+                color: #2d3436;
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+                transition: all 0.2s ease;
+            }
+
+            input:focus,
+            select:focus,
+            textarea:focus {
+                outline: none;
+                border-color: #6c5ce7;
+                background: #fff;
+                box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+            }
+
+            textarea {
+                min-height: 80px;
+                resize: vertical;
+            }
+
+            button {
+                background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+                color: #fff;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-right: 8px;
+                margin-bottom: 8px;
+                box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+            }
+
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+                background: linear-gradient(135deg, #5b4bc4 0%, #8c82ff 100%);
+            }
+
+            button:active {
+                transform: translateY(1px);
+            }
+
+            button:disabled {
+                background: #dfe6e9;
+                color: #b2bec3;
+                box-shadow: none;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .hidden {
+                display: none !important;
+            }
+
+            .status-msg {
+                margin-top: 10px;
+                font-weight: 600;
+                font-size: 0.95rem;
+                color: #00b894;
+                animation: fadeIn 0.3s ease;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-5px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            table {
+                width: 100%;
+                max-width: 600px;
+                border-collapse: separate;
+                border-spacing: 0;
+                font-size: 0.95rem;
+                overflow: hidden;
+                border-radius: 12px;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            th,
+            td {
+                padding: 12px 16px;
+                text-align: left;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+
+            th {
+                background: rgba(108, 92, 231, 0.05);
+                font-weight: 600;
+                color: #2d3436;
+                cursor: pointer;
+                transition: background 0.2s ease;
+            }
+
+            th:hover {
+                background: rgba(108, 92, 231, 0.1);
+            }
+
+            tr:last-child td {
+                border-bottom: none;
+            }
+
+            .modal {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(45, 52, 54, 0.6);
+                backdrop-filter: blur(5px);
+                justify-content: center;
+                align-items: center;
+                z-index: 100;
+            }
+
+            .modal-content {
+                background: #fff;
+                padding: 30px;
+                border-radius: 16px;
+                width: 320px;
+                text-align: center;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+                animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            @keyframes modalPop {
+                from {
+                    transform: scale(0.8);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .drop-zone {
+                width: 100%;
+                max-width: 300px;
+                height: 100px;
+                border: 2px dashed #b2bec3;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #636e72;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                background: rgba(255, 255, 255, 0.5);
+            }
+
+            .draggable {
+                width: 120px;
+                height: 50px;
+                background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                cursor: grab;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                box-shadow: 0 4px 10px rgba(232, 67, 147, 0.3);
+                transition: transform 0.2s;
+            }
+
+            .draggable:active {
+                cursor: grabbing;
+                transform: scale(0.95);
+            }
+
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                background: #fff;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                min-width: 150px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+                z-index: 10;
+                overflow: hidden;
+                top: 110%;
+                animation: fadeIn 0.2s ease;
+            }
+
+            .dropdown-content p {
+                margin: 0;
+                padding: 12px 16px;
+                cursor: pointer;
+                transition: background 0.2s ease;
+                color: #2d3436;
+            }
+
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+
+            .dropdown-content p:hover {
+                background: #f1f2f6;
+                color: #6c5ce7;
+            }
+
+            .tooltip {
+                position: relative;
+                display: inline-block;
+                cursor: help;
+                border-bottom: 2px dotted #6c5ce7;
+                color: #6c5ce7;
+                font-weight: 600;
+            }
+
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 140px;
+                background: #2d3436;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 8px 12px;
+                position: absolute;
+                z-index: 1;
+                bottom: 130%;
+                left: 50%;
+                transform: translateX(-50%) translateY(10px);
+                opacity: 0;
+                transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                font-size: 0.85rem;
+                font-weight: 500;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .tooltip .tooltiptext::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -6px;
+                border-width: 6px;
+                border-style: solid;
+                border-color: #2d3436 transparent transparent transparent;
+            }
+
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            .resizable {
+                width: 180px;
+                height: 100px;
+                border: 2px dashed #6c5ce7;
+                background: rgba(108, 92, 231, 0.05);
+                resize: both;
+                overflow: auto;
+                padding: 15px;
+                border-radius: 8px;
+                min-width: 120px;
+                min-height: 60px;
+                color: #6c5ce7;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+        </style>
+    </div>
+
+    <!-- SECTION 8 -->
+    <div class="section" id="section-8">
+        <h2>Section 8: Table Automation</h2>
+        <input type="text" id="table-search" placeholder="Search by name filter"
+            onkeyup="let f=this.value.toLowerCase(); document.querySelectorAll('#data-table tbody tr').forEach(r=>{let c=r.cells[0]; if(c) r.style.display=c.innerText.toLowerCase().includes(f)?'':'none';})">
+        <table id="data-table" style="margin-top: 10px;">
+            <thead>
+                <tr>
+                    <th onclick="sortT()">Name ↕</th>
+                    <th>Department</th>
+                    <th>Role</th>
+                    <th>Salary</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Zack</td>
+                    <td>Engineering</td>
+                    <td>QA Automation</td>
+                    <td>$95k</td>
+                </tr>
+                <tr>
+                    <td>Alice</td>
+                    <td>Marketing</td>
+                    <td>SEO Lead</td>
+                    <td>$80k</td>
+                </tr>
+                <tr>
+                    <td>John</td>
+                    <td>Engineering</td>
+                    <td>Developer</td>
+                    <td>$100k</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="margin-top: 10px;"> <button disabled>Prev</button> Page 1 of 1 <button disabled>Next</button></div>
+        <script>
+            function sortT() {
+                let t = document.getElementById('data-table'), r, i, x, y, s; let p = true;
+                while (p) {
+                    p = false; r = t.rows;
+                    for (i = 1; i < (r.length - 1); i++) {
+                        s = false; x = r[i].getElementsByTagName("TD")[0]; y = r[i + 1].getElementsByTagName("TD")[0];
+                        if (x.innerText.toLowerCase() > y.innerText.toLowerCase()) { s = true; break; }
+                    }
+                    if (s) { r[i].parentNode.insertBefore(r[i + 1], r[i]); p = true; }
+                }
+            }
+        </script>
+    </div>
+
+    <!-- SECTION 9 -->
+    <div class="section" id="section-9">
+        <h2>Section 9: Alerts</h2>
+        <button id="alert-btn" onclick="alert('Simple Alert Present')">Simple Alert</button>
+        <button id="confirm-btn"
+            onclick="document.getElementById('s9-msg').innerText = confirm('Accept or Reject?') ? 'Accepted' : 'Rejected'">Confirmation
+            Alert</button>
+        <button id="prompt-btn"
+            onclick="let ret = prompt('Enter your name:'); document.getElementById('s9-msg').innerText = ret ? 'Prompt: '+ret : 'Prompt Cancelled'">Prompt
+            Alert</button>
+        <div id="s9-msg" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 10 -->
+    <div class="section" id="section-10">
+        <h2>Section 10: Modals</h2>
+        <button id="open-modal-btn" onclick="document.getElementById('custom-modal').style.display='flex'">Open
+            Modal</button>
+        <div id="custom-modal" class="modal">
+            <div class="modal-content">
+                <h3>Custom Modal Overlay</h3>
+                <p>Testing z-index and overlays</p>
+                <button id="close-modal-btn"
+                    onclick="document.getElementById('custom-modal').style.display='none'">Close Modal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 11 -->
+    <div class="section" id="section-11">
+        <h2>Section 11: Iframe</h2>
+        <!-- Embedded iframe contents cleanly for offline support -->
+        <iframe id="iframe-target" style="width:100%; height:120px; border:1px solid #ccc; background:#fff;"
+            srcdoc="<html><body style='font-family:sans-serif;'><h4>Inside Iframe</h4><form onsubmit='event.preventDefault();document.getElementById(`if-res`).innerText=`Form Submitted in Iframe!`;'><input type='text' id='iframe-input' placeholder='Type in iframe'><button type='submit' id='iframe-btn'>Submit</button></form><div id='if-res' style='color:green;font-weight:bold;margin-top:5px;'></div></body></html>"></iframe>
+    </div>
+
+    <!-- SECTION 12 -->
+    <div class="section" id="section-12">
+        <h2>Section 12: Shadow DOM</h2>
+        <div id="shadow-host"></div>
+        <script>
+            const shadow = document.getElementById('shadow-host').attachShadow({ mode: 'open' });
+            shadow.innerHTML = `
+            <style>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            padding: 40px 20px;
+            color: #2d3436;
+            margin: 0;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            margin-top: 0;
+            padding-bottom: 15px;
+            color: #2d3436;
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 16px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+        }
+
+        .group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: #636e72;
+        }
+
+        input[type="text"], input[type="password"], input[type="email"], input[type="tel"], input[type="file"], input[type="date"], select, textarea {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 16px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: #2d3436;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #6c5ce7;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5b4bc4 0%, #8c82ff 100%);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background: #dfe6e9;
+            color: #b2bec3;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .status-msg {
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #00b894;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        table {
+            width: 100%;
+            max-width: 600px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.95rem;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        th {
+            background: rgba(108, 92, 231, 0.05);
+            font-weight: 600;
+            color: #2d3436;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        th:hover {
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(45, 52, 54, 0.6);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .drop-zone {
+            width: 100%;
+            max-width: 300px;
+            height: 100px;
+            border: 2px dashed #b2bec3;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #636e72;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.5);
+        }
+
+        .draggable {
+            width: 120px;
+            height: 50px;
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: grab;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(232, 67, 147, 0.3);
+            transition: transform 0.2s;
+        }
+        
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.05);
+            min-width: 150px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            z-index: 10;
+            overflow: hidden;
+            top: 110%;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .dropdown-content p {
+            margin: 0;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            color: #2d3436;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content p:hover {
+            background: #f1f2f6;
+            color: #6c5ce7;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 2px dotted #6c5ce7;
+            color: #6c5ce7;
+            font-weight: 600;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 140px;
+            background: #2d3436;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #2d3436 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .resizable {
+            width: 180px;
+            height: 100px;
+            border: 2px dashed #6c5ce7;
+            background: rgba(108, 92, 231, 0.05);
+            resize: both;
+            overflow: auto;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 120px;
+            min-height: 60px;
+            color: #6c5ce7;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+    </style>
+            <label style="font-weight:bold;display:block;margin-bottom:5px;">Shadow DOM Element</label>
+            <input type="text" id="shadow-input" placeholder="Enter text">
+            <button id="shadow-btn" onclick="this.innerText='Shadow Clicked'">Shadow Button</button>
+        `;
+        </script>
+    </div>
+
+    <!-- SECTION 13 -->
+    <div class="section" id="section-13">
+        <h2>Section 13: Drag and Drop</h2>
+        <div id="drag-source" class="draggable" draggable="true">Drag Me</div>
+        <div id="drop-target" class="drop-zone">Drop Zone</div>
+        <div id="s13-msg" class="status-msg hidden">Item Dropped successfully!</div>
+        <script>
+            let src_drag = document.getElementById('drag-source'), tgt_drop = document.getElementById('drop-target');
+            src_drag.ondragstart = e => e.dataTransfer.setData('text/plain', 'drag');
+            tgt_drop.ondragover = e => e.preventDefault();
+            tgt_drop.ondrop = e => { e.preventDefault(); tgt_drop.innerHTML = 'Success'; document.getElementById('s13-msg').classList.remove('hidden'); };
+        </script>
+    </div>
+
+    <!-- SECTION 14 -->
+    <div class="section" id="section-14">
+        <h2>Section 14: Hover Elements</h2>
+        <div class="dropdown" onmouseover="document.getElementById('hover-sm').classList.remove('hidden')"
+            onmouseout="document.getElementById('hover-sm').classList.add('hidden')">
+            <button id="hover-trigger">Hover Over Me</button>
+            <div id="hover-sm" class="dropdown-content hidden" style="display:block; position:absolute;">
+                <p id="sub-menu-1" onclick="document.getElementById('s14-msg').innerText='Sub Menu 1 Clicked'">Sub Menu
+                    1</p>
+                <p id="sub-menu-2" onclick="document.getElementById('s14-msg').innerText='Sub Menu 2 Clicked'">Sub Menu
+                    2</p>
+            </div>
+        </div>
+        <div id="s14-msg" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 15 -->
+    <div class="section" id="section-15">
+        <h2>Section 15: Tooltip</h2>
+        <div class="tooltip" id="tooltip-target">Hover to view tooltip
+            <span class="tooltiptext">I am a tooltip</span>
+        </div>
+    </div>
+
+    <!-- SECTION 16 -->
+    <div class="section" id="section-16">
+        <h2>Section 16: File Upload</h2>
+        <input type="file" id="file-upload"
+            onchange="document.getElementById('s16-msg').innerText = 'File uploaded: ' + this.files[0].name">
+        <div id="s16-msg" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 17 -->
+    <div class="section" id="section-17">
+        <h2>Section 17: Download</h2>
+        <a href="data:text/plain;charset=utf-8,Test%20Download%20Data" download="practice-file.txt">
+            <button id="download-btn">Download Small Text File</button>
+        </a>
+    </div>
+
+    <!-- SECTION 18 -->
+    <div class="section" id="section-18">
+        <h2>Section 18: Hidden Elements</h2>
+        <button id="hidden-btn" class="hidden">I am invisible initially</button>
+        <button id="reveal-btn" onclick="document.getElementById('hidden-btn').classList.remove('hidden')">Reveal Hidden
+            Button</button>
+    </div>
+
+    <!-- SECTION 19 -->
+    <div class="section" id="section-19">
+        <h2>Section 19: Scroll Testing</h2>
+        <div
+            style="height:120px; overflow-y:auto; border:1px solid #ccc; position:relative; background:#fff; border-radius:4px;">
+            <div style="height:350px; padding:10px;">Scroll Down to view element...</div>
+            <button id="scroll-target" style="position:absolute; bottom:10px; left:10px;">Scrolled Button
+                Target</button>
+        </div>
+    </div>
+
+    <!-- SECTION 20 -->
+    <div class="section" id="section-20">
+        <h2>Section 20: Multiple Windows</h2>
+        <button id="open-tab-btn" onclick="window.open(window.location.href, '_blank')">Open New Tab</button>
+    </div>
+
+    <!-- SECTION 21 -->
+    <div class="section" id="section-21">
+        <h2>Section 21: Authentication Simulation</h2>
+        <div id="login-form">
+            <div class="group"><input type="text" id="auth-user" placeholder="Username (admin)"></div>
+            <div class="group"><input type="password" id="auth-pass" placeholder="Password (admin)"></div>
+            <button id="login-btn" onclick="simulateLogin()">Login</button>
+            <div id="login-err" class="status-msg hidden" style="color:#e74c3c;">Invalid credentials</div>
+        </div>
+        <div id="logged-in-dash" class="hidden">
+            <h3 style="color:#27ae60; margin-top:0;">Dashboard Active</h3>
+            <button id="logout-btn" onclick="simulateLogout()">Logout</button>
+        </div>
+        <script>
+            function simulateLogin() {
+                if (document.getElementById('auth-user').value === 'admin' && document.getElementById('auth-pass').value === 'admin') {
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('logged-in-dash').classList.remove('hidden');
+                    document.getElementById('login-err').classList.add('hidden');
+                } else document.getElementById('login-err').classList.remove('hidden');
+            }
+            function simulateLogout() {
+                document.getElementById('auth-user').value = ''; document.getElementById('auth-pass').value = '';
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('logged-in-dash').classList.add('hidden');
+            }
+        </script>
+    </div>
+
+    <!-- SECTION 22 -->
+    <div class="section" id="section-22">
+        <h2>Section 22: Stale Element Simulation</h2>
+        <div id="stale-container">
+            <button id="stale-btn"
+                onclick="document.getElementById('stale-container').innerHTML='<button id=\'stale-btn\'>I am a completely new DOM element</button>'">Click
+                to trigger Stale Element</button>
+        </div>
+    </div>
+
+    <!-- SECTION 23 -->
+    <div class="section" id="section-23">
+        <h2>Section 23: Dynamic List</h2>
+        <button id="add-item-btn"
+            onclick="let addList=document.getElementById('dyn-list'); let li=document.createElement('li'); li.innerText='Item '+(addList.children.length+1); addList.appendChild(li);">Add
+            Item</button>
+        <button id="remove-item-btn"
+            onclick="let remList=document.getElementById('dyn-list'); if(remList.lastChild) remList.lastChild.remove();">Remove
+            Item</button>
+        <ul id="dyn-list">
+            <li>Static Item</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 24 -->
+    <div class="section" id="section-24">
+        <h2>Section 24: Network Delay Simulation</h2>
+        <button id="api-trigger"
+            onclick="document.getElementById('api-res').classList.add('hidden'); setTimeout(()=>document.getElementById('api-res').classList.remove('hidden'), 2500)">Simulate
+            API Call</button>
+        <div id="api-res" class="status-msg hidden">API Call Completed successfully</div>
+    </div>
+
+    <!-- SECTION 25 -->
+    <div class="section" id="section-25">
+        <h2>Section 25: Random Fail Elements</h2>
+        <button id="flaky-btn"
+            onclick="let el=document.getElementById('flaky-res'); if(Math.random()>0.5){el.innerText='Action Success!';el.style.color='#27ae60';}else{el.innerText='Action Failed!';el.style.color='#e74c3c';}">Trigger
+            Flaky Action</button>
+        <div id="flaky-res" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 26 -->
+    <div class="section" id="section-26">
+        <h2>Section 26: Keyboard Actions</h2>
+        <input type="text" id="keyboard-input" placeholder="Press Enter, Tab or Arrows"
+            onkeydown="document.getElementById('key-res').innerText = 'You pressed: ' + event.key">
+        <div id="key-res" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 27 -->
+    <div class="section" id="section-27">
+        <h2>Section 27: Slider Element</h2>
+        <input type="range" id="range-slider" min="0" max="100" value="50"
+            oninput="document.getElementById('slider-val').innerText = this.value" style="width:200px;">
+        <div>Slider Output: <span id="slider-val" class="status-msg">50</span></div>
+    </div>
+
+    <!-- SECTION 28 -->
+    <div class="section" id="section-28">
+        <h2>Section 28: Date Picker</h2>
+        <input type="date" id="date-input"
+            onchange="document.getElementById('date-val').innerText = 'Selected: ' + this.value">
+        <div id="date-val" class="status-msg"></div>
+    </div>
+
+    <!-- SECTION 29 -->
+    <div class="section" id="section-29">
+        <h2>Section 29: Resizable Element</h2>
+        <div id="resizable-box" class="resizable">Resize using the bottom right handle</div>
+    </div>
+
+    <!-- SECTION 30 -->
+    <div class="section" id="section-30">
+        <h2>Section 30: Complex DOM Structure</h2>
+        <div class="complex-level-1">
+            <div class="complex-level-2" data-type="container">
+                <ul class="complex-list">
+                    <li class="complex-item"><span class="meaningless-span">Noise</span></li>
+                    <li class="complex-item">
+                        <div class="target-wrapper">
+                            <button id="deeply-nested-btn">Deeply Nested XPath target</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -27,6 +27,7 @@ src/
 	pages/            -> Page Object classes (UI logic)
 	factories/        -> Test data builders
 	tests/
+		data/         -> External data sources (.csv, .json)
 		features/     -> Gherkin feature files (.feature)
 		stepDefinitions/ -> Step implementations
 		hooks/        -> Browser/Context lifecycle hooks
