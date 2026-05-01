@@ -51,7 +51,8 @@ Thumbs.db
 .idea/
 
 # Report History
-report-history/
+report-history/*
+!report-history/index.html
 
 # Documentation
 README.md
